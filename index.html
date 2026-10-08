@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Goldman–Karniol family tree</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9EDEC; --surface:#F7F9F8; --ink:#1E2A33; --muted:#5D6B72; --line:#8A9BA3;
+  --accent:#2F4F6F; --probable:#A87A2A; --memorial:#4A3B52; --card:#FFFFFF; --cardline:#C5CFD2;
+  --serif:"EB Garamond", Garamond, "Times New Roman", serif;
+  --sans:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#161C20; --surface:#1D252A; --ink:#E3E8EA; --muted:#9AA8AE; --line:#5E6F77;
+    --accent:#8FB3D9; --probable:#D6A956; --memorial:#B9A3C7; --card:#232D33; --cardline:#3A474E;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#161C20; --surface:#1D252A; --ink:#E3E8EA; --muted:#9AA8AE; --line:#5E6F77;
+  --accent:#8FB3D9; --probable:#D6A956; --memorial:#B9A3C7; --card:#232D33; --cardline:#3A474E;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;display:flex;flex-direction:column}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem 1.5rem;padding:1rem 1.25rem .75rem;border-bottom:1px solid var(--cardline)}
+h1{font-family:var(--serif);font-weight:500;font-size:1.9rem;line-height:1.1;margin:0;letter-spacing:-.005em}
+.sub{color:var(--muted);font-size:.85rem;margin:0}
+.tools{margin-left:auto;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+input[type=search]{font:inherit;font-size:.9rem;padding:.4rem .6rem;border:1px solid var(--cardline);border-radius:4px;background:var(--surface);color:var(--ink);width:13rem;max-width:60vw}
+button{font:inherit;font-size:.85rem;padding:.35rem .7rem;border:1px solid var(--cardline);border-radius:4px;background:var(--surface);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{flex:1;display:flex;min-height:0}
+#canvas{flex:1;overflow:auto;position:relative}
+#panel{width:23rem;max-width:100%;border-left:1px solid var(--cardline);background:var(--surface);overflow:auto;padding:1.25rem 1.4rem 2rem}
+#panel h2{font-family:var(--serif);font-weight:500;font-size:1.65rem;line-height:1.15;margin:0 0 .2rem}
+#panel .aka{color:var(--muted);font-size:.85rem;margin:0 0 .8rem}
+#panel h3{font-family:var(--serif);font-weight:600;font-size:1.05rem;margin:1.2rem 0 .35rem}
+.ev{margin:0 0 .65rem}
+.ev .what{font-weight:500}
+.ev .src,.note{color:var(--muted);font-size:.83rem}
+.note{margin:.3rem 0}
+.flag{display:inline-block;font-size:.78rem;padding:.05rem .45rem;border-radius:3px;margin:0 .3rem .4rem 0;border:1px solid}
+.flag.prob{color:var(--probable);border-color:var(--probable)}
+.flag.mem{color:var(--memorial);border-color:var(--memorial)}
+.rel a{color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.rel{margin:.15rem 0}
+.empty{color:var(--muted);font-family:var(--serif);font-style:italic;font-size:1.15rem}
+.legend{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;font-size:.8rem;color:var(--muted);padding:.5rem 1.25rem;border-top:1px solid var(--cardline)}
+.legend svg{vertical-align:middle;margin-right:.35rem}
+svg text{font-family:var(--serif)}
+.person{cursor:pointer}
+.person rect.box{fill:var(--card);stroke:var(--cardline);stroke-width:1}
+.person:hover rect.box{stroke:var(--accent)}
+.person.sel rect.box{stroke:var(--accent);stroke-width:2.5}
+.person.dim{opacity:.35}
+.person .nm{fill:var(--ink);font-size:16px;font-weight:500}
+.person .yr{fill:var(--muted);font-size:13px;font-family:var(--sans)}
+.person .mem{fill:var(--memorial)}
+.person:focus{outline:none}
+.person:focus-visible rect.box{stroke:var(--accent);stroke-width:2.5;stroke-dasharray:4 2}
+.lk{stroke:var(--line);stroke-width:1.4;fill:none}
+.lk.prob{stroke:var(--probable);stroke-dasharray:5 4}
+.mar{stroke:var(--line);stroke-width:1.4}
+@media (max-width:760px){
+  main{flex-direction:column}
+  #panel{width:auto;border-left:0;border-top:1px solid var(--cardline);max-height:45%}
+  h1{font-size:1.5rem}
+}
+@media (prefers-reduced-motion:no-preference){ #canvas{scroll-behavior:smooth} }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Goldman–Karniol family tree</h1>
+    <p class="sub">Snapshot of 8 October 2026. Confirmed and probable relatives only, including Yetta Karniol Rubrum's branch and Pinkas Sperling's family. Select a person for dates, sources and notes.</p>
+  </div>
+  <div class="tools">
+    <input type="search" id="q" placeholder="Find a person" aria-label="Find a person" list="names">
+    <datalist id="names"></datalist>
+    <button id="zo" aria-label="Zoom out">−</button>
+    <button id="zi" aria-label="Zoom in">+</button>
+    <button id="dl7" hidden>Save GEDCOM 7</button>
+    <button id="dl5" hidden>Export GEDCOM 5.5.1</button>
+  </div>
+</header>
+<main>
+  <div id="canvas" aria-label="Family tree"></div>
+  <aside id="panel" aria-live="polite"><p class="empty">Select anyone in the tree to see what the records say about them.</p></aside>
+</main>
+<div class="legend">
+  <span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" class="lk"/></svg>Documented parentage</span>
+  <span><svg width="28" height="8"><line x1="0" y1="4" x2="28" y2="4" class="lk prob"/></svg>Probable parentage</span>
+  <span><svg width="10" height="12"><rect x="0" y="0" width="5" height="12" style="fill:var(--memorial)"/></svg>Murdered in the Holocaust</span>
+</div>
+<script type="application/json" id="gedcom">"0 HEAD\n1 GEDC\n2 VERS 7.0\n1 SCHMA\n2 TAG _CONF https://goldman-karniol.family/ext/_CONF\n1 SOUR GOLDMAN-KARNIOL\n2 NAME Goldman-Karniol Family Research\n1 DATE 6 OCT 2026\n1 SUBM @U1@\n1 LANG en\n1 NOTE Master copy in GEDCOM 7.0. Confirmed and probable people only. _CONF PROBABLE on a FAMC link marks parentage that is probable but not proven.\n0 @U1@ SUBM\n1 NAME Akiva Goldman\n0 @N1@ SNOTE Religious marriage only. Galician civil registers treated such children as illegitimate and usually recorded them under the mother's surname.\n0 @I1@ INDI\n1 NAME Baruch Shlomo /Goldman/\n2 GIVN Baruch Shlomo\n2 SURN Goldman\n2 TRAN \u05d1\u05e8\u05d5\u05da \u05e9\u05dc\u05de\u05d4\n3 LANG he\n1 NAME Solomon /Goldman/\n2 TYPE AKA\n1 NAME Sol /Goldman/\n2 TYPE AKA\n1 SEX M\n1 BIRT\n2 DATE 20 JUL 1894\n2 PLAC Chorostk\u00f3w, Husiatyn, Galicia, Austria-Hungary\n2 NOTE 1940 naturalization petition gives 15 Jul 1894.\n2 SOUR @S1@\n3 PAGE Entry 61, pp. 281-282\n1 IMMI\n2 DATE 10 OCT 1921\n2 PLAC New York, New York, USA\n2 NOTE S.S. Celtic from Liverpool, as Baruch Goldman.\n2 SOUR @S2@\n1 OCCU Furrier\n2 PLAC Bronx, New York, USA\n1 RESI 1801 Morrison Ave\n2 DATE 5 APR 1930\n2 PLAC Bronx, New York, USA\n2 SOUR @S4@\n1 RESI 1364 Washington Ave\n2 DATE 6 NOV 1940\n2 PLAC Bronx, New York, USA\n2 SOUR @S5@\n1 NATU\n2 DATE 25 FEB 1941\n2 PLAC New York, New York, USA\n2 NOTE Petition 367372, S.D.N.Y.; certificate 4960756.\n2 SOUR @S5@\n1 NOTE Birth registered as illegitimate because his parents' marriage was religious only.\n1 FAMC @F2@\n1 FAMS @F1@\n0 @I2@ INDI\n1 NAME Clara /Karniol/\n1 NAME Klara /Karmiol/\n2 TYPE AKA\n2 NOTE As written on her 1921 arrival manifest.\n1 SEX F\n1 BIRT\n2 DATE ABT 1900\n3 PHRASE 1900 per the 1940 petition; age 23 on the Jan 1921 manifest implies c. 1897-98\n2 PLAC Jaz\u0142owiec, Buczacz, Galicia, Austria-Hungary\n2 NOTE Birthplace probable: both brothers were born there.\n2 SOUR @S5@\n1 IMMI\n2 DATE 24 JAN 1921\n2 PLAC New York, New York, USA\n2 NOTE S.S. Carmania from Liverpool, as Klara Karmiol, 23, of Buczacz (birthplace also given as Buczacz). Nearest relative: father Lezer Karmiol (sic), Jaz\u0142owiec. Joining cousin \"Emanuel Rutrum\", 805 Tremont Ave, Bronx: Emanuel Rubrum, son of her probable aunt Yetta. Probably released from Ellis Island 28 Jan 1921.\n2 SOUR @S11@\n3 PAGE List 15, line 11\n1 NATU\n2 DATE 24 JAN 1927\n2 PLAC Bronx, New York, USA\n2 NOTE Certificate 2359101.\n2 SOUR @S5@\n1 FAMC @F4@\n1 FAMS @F1@\n0 @I3@ INDI\n1 NAME Bernard /Goldman/\n1 NAME Beryl /Goldman/\n2 TYPE BIRTH\n1 SEX M\n1 BIRT\n2 DATE 6 MAR 1927\n2 PLAC New York, New York, USA\n2 SOUR @S5@\n1 FAMC @F1@\n0 @I4@ INDI\n1 NAME Leonard /Goldman/\n1 NAME Lazar /Goldman/\n2 TYPE BIRTH\n1 SEX M\n1 BIRT\n2 DATE 6 JAN 1930\n2 PLAC New York, New York, USA\n2 SOUR @S5@\n1 FAMC @F1@\n0 @I5@ INDI\n1 NAME Jacob Simon /Goldman/\n2 TRAN \u05d9\u05e2\u05e7\u05d1 \u05e9\u05de\u05e2\u05d5\u05df\n3 LANG he\n1 NAME Jack /Goldman/\n2 TYPE AKA\n1 SEX M\n1 BIRT\n2 DATE 13 SEP 1936\n2 PLAC New York, New York, USA\n2 SOUR @S5@\n1 DEAT\n2 DATE 2022\n2 NOTE Family information.\n1 NOTE Hebrew name \u05d9\u05e2\u05e7\u05d1 \u05e9\u05de\u05e2\u05d5\u05df \u05d1\u05df \u05d1\u05e8\u05d5\u05da \u05e9\u05dc\u05de\u05d4 (Yaakov Shimon ben Baruch Shlomo), per family.\n1 FAMC @F1@\n0 @I6@ INDI\n1 NAME Berl /Goldman/\n1 SEX M\n1 OCCU Of independent means (Privat)\n2 SOUR @S1@\n1 NOTE Hebrew name probably Dov (inferred, not recorded). Probably died before Oct 1921: Sol's manifest names an uncle, not his father, as nearest relative abroad; grandson Beryl was named for him in Mar 1927. Family says he stayed in Galicia.\n1 FAMS @F2@\n0 @I7@ INDI\n1 NAME Czarna /Sperling/\n1 NAME Celia /Sperling/\n2 TYPE AKA\n1 SEX F\n1 BIRT\n2 DATE EST 1872\n3 PHRASE probably 1872\u201373: not in the birth index, which lacks those years\n2 PLAC Chorostk\u00f3w, Husiatyn, Galicia, Austria-Hungary\n1 IMMI\n2 PLAC New York, New York, USA\n2 NOTE Lived on the Lower East Side and spoke only Yiddish (Jack Goldman's memory).\n1 NOTE Speculative, unconfirmed: possibly the \"mother, Jeni(?) Brander\" of 320(?) Delancey St whom Sol was joining in Oct 1921 (manifest), under a remarried name. No record yet links the two names.\n1 FAMC @F3@\n1 FAMS @F2@\n0 @I8@ INDI\n1 NAME Josel /Sperling/\n1 SEX M\n1 OCCU Leather dealer\n2 DATE 1891\n2 PLAC Chorostk\u00f3w, Husiatyn, Galicia, Austria-Hungary\n2 NOTE Probably the \"Jossel Sperling\" of the 1891 directory.\n2 SOUR @S10@\n1 NOTE Children with Gittel in the Chorostk\u00f3w birth index: Bassie (1858), Pinkas (1861), Chaje (1874), Leib Moses (1875). Czarna's birth is not indexed (probably 1872\u201373, years missing from the index).\n1 FAMS @F3@\n0 @I9@ INDI\n1 NAME Gittel //\n1 SEX F\n1 FAMS @F3@\n0 @I10@ INDI\n1 NAME Pinkas /Sperling/\n1 SEX M\n1 BIRT\n2 DATE 1861\n2 PLAC Chorostk\u00f3w, Husiatyn, Galicia, Austria-Hungary\n2 SOUR @S28@\n3 PAGE Births 1861, akta 24\n1 OCCU Leather dealer\n2 DATE 1891\n2 PLAC Chorostk\u00f3w, Husiatyn, Galicia, Austria-Hungary\n2 SOUR @S10@\n1 RESI\n2 DATE OCT 1921\n2 PLAC Chorostk\u00f3w, Husiatyn, Poland\n2 SOUR @S2@\n3 PAGE Nearest relative: uncle, P. Sperling\n1 FAMC @F3@\n1 FAMS @F19@\n1 NOTE Born 1861 in Chorostk\u00f3w, son of Jossel and Gittel Sperling (JRI-Poland, births 1861, akta 24). Evidently the \"uncle P. Sperling\" of Sol's 1921 manifest. Married Sara Ester Roth (Rother) of Grzyma\u0142\u00f3w; children born in Chorostk\u00f3w: Israel (1889), Moses Leib (1891), Isak (1894), Chane (1896), Dawid (1898). Dawid was murdered in Kopyczy\u0144ce in 1943 (Yad Vashem); the others' fates are unknown. A \"Pinchas & his wife\" Sperling is in the Chorostk\u00f3w Yizkor book necrology (possibly him, or the younger Pinkas b. 1881, son of Berl Sperling).\n0 @I11@ INDI\n1 NAME Lazar /Karniol/\n1 NAME Eliezer /Karniol/\n2 TYPE AKA\n1 NAME Leser /Karniol/\n2 TYPE AKA\n1 NAME Lezer /Karmiol/\n2 TYPE AKA\n2 NOTE As written on daughter Klara's 1921 manifest.\n1 SEX M\n1 BIRT\n2 DATE ABT 1873\n3 PHRASE age 56 at death\n1 DEAT\n2 DATE 7 OCT 1929\n2 PLAC Tarnopol, Tarnopol, Poland\n2 NOTE Czackiego 26; married. Died 8 pm of pneumonia (zapalenie p\u0142uc); buried 9 Oct 1929, Tarnopol; registered 8 Oct 1929 (Dr. K. Witoszy\u0144ski).\n2 SOUR @S7@\n3 PAGE Record 143 (running no. 157), p. 24; FamilySearch DGS 7811138, image 662\n1 FAMC @F11@\n2 _CONF PROBABLE\n2 NOTE Very probable: Yetta and Scheindel's mother Reise Lea was evidently the Retzie Lea Karniol who lived with Lazar's widow and sons in the 1930s, and Lazar named his first son Markus (Mordechai). No record yet names Lazar's parents.\n1 FAMS @F4@\n0 @I12@ INDI\n1 NAME Chane Ruchel /Sch\u00e4chter/\n2 TRAN \u05d7\u05e0\u05d4 \u05e8\u05d7\u05dc\n3 LANG he\n1 NAME Chana Rachel /Karniol/\n2 TYPE MARRIED\n1 SEX F\n1 BIRT\n2 DATE 10 JUL 1874\n2 PLAC Jaz\u0142owiec, Buczacz, Galicia, Austria-Hungary\n2 SOUR @S6@\n1 RESI Czackiego 26a\n2 DATE FROM 1922\n3 PHRASE resident since 1922; card from the 1930s\n2 PLAC Tarnopol, Tarnopol, Poland\n2 SOUR @S6@\n1 DEAT\n2 DATE ABT 1942\n3 PHRASE during the Holocaust\n2 NOTE Murdered in the Holocaust. Page of Testimony gives Jaz\u0142owiec; she lived in Tarnopol, so place unverified.\n2 SOUR @S8@\n3 PAGE 54214/16\n1 EXID 445454\n2 TYPE https://collections.yadvashem.org/en/names/\n1 FAMC @F5@\n1 FAMS @F4@\n0 @I13@ INDI\n1 NAME Markus /Karniol/\n1 NAME Motil /Karniol/\n2 TYPE AKA\n2 TRAN \u05de\u05d5\u05d8\u05d9\u05dc\n3 LANG he\n1 SEX M\n1 BIRT\n2 DATE 10 OCT 1902\n2 PLAC Jaz\u0142owiec, Buczacz, Galicia, Austria-Hungary\n2 SOUR @S6@\n1 OCCU Merchant\n2 SOUR @S8@\n1 RESI Czackiego 26a\n2 DATE FROM 1922\n3 PHRASE resident since 1922; card from the 1930s\n2 PLAC Tarnopol, Tarnopol, Poland\n2 SOUR @S6@\n1 DEAT\n2 DATE ABT 1942\n3 PHRASE during the Holocaust\n2 PLAC Tarnopol, Tarnopol, Poland\n2 NOTE Murdered in the Holocaust.\n2 SOUR @S8@\n3 PAGE 54214/15\n1 EXID 449751\n2 TYPE https://collections.yadvashem.org/en/names/\n1 FAMC @F4@\n1 FAMS @F18@\n0 @I14@ INDI\n1 NAME Moses /Karniol/\n1 SEX M\n1 BIRT\n2 DATE 15 APR 1905\n2 PLAC Jaz\u0142owiec, Buczacz, Galicia, Austria-Hungary\n2 SOUR @S6@\n1 RESI Czackiego 26a\n2 DATE FROM 1922\n3 PHRASE resident since 1922; card from the 1930s\n2 PLAC Tarnopol, Tarnopol, Poland\n2 SOUR @S6@\n1 NOTE Fate unknown; no Page of Testimony found.\n1 FAMC @F4@\n0 @I15@ INDI\n1 NAME Moses /Kohn/\n1 NAME Moshe /Sch\u00e4chter/\n2 TYPE AKA\n1 SEX M\n1 OCCU Butcher\n2 PLAC Jaz\u0142owiec, Buczacz, Galicia, Austria-Hungary\n2 SOUR @S9@\n1 NOTE Probably died before Apr 1905 (grandson Moses Karniol named for him).\n1 FAMS @F5@\n0 @I16@ INDI\n1 NAME Ester Lea /Schechter/\n2 TRAN \u05d0\u05e1\u05ea\u05e8 \u05dc\u05d0\u05d4\n3 LANG he\n1 NAME Estera /Distenfeld/\n2 TYPE AKA\n1 SEX F\n1 BIRT\n2 DATE BET 1845 AND 1855\n3 PHRASE estimated from her children's births\n1 NOTE \"Schechter\" on son Wolf's 1912 marriage; \"Distenfeld\" on Chane's Tarnopol card and Page of Testimony. She may have carried one surname from each parent.\n1 FAMS @F5@\n0 @I17@ INDI\n1 NAME Wolf /Kohn vel Schechter/\n1 SEX M\n1 BIRT\n2 DATE ABT 1867\n3 PHRASE age 45 in 1912; Page of Testimony implies c. 1881\n2 PLAC Jaz\u0142owiec, Buczacz, Galicia, Austria-Hungary\n2 SOUR @S9@\n1 OCCU Butcher / shochet\n2 PLAC Synow\u00f3dzko Wy\u017cne, Stryj, Poland\n1 DEAT\n2 DATE ABT 1942\n3 PHRASE during the Holocaust\n2 PLAC Synow\u00f3dzko Wy\u017cne, Stryj, Poland\n2 NOTE Murdered in the Holocaust.\n2 SOUR @S8@\n3 PAGE 54214/13\n1 EXID 437958\n2 TYPE https://collections.yadvashem.org/en/names/\n1 FAMC @F5@\n1 FAMS @F6@\n0 @I18@ INDI\n1 NAME Matis /Kohn-Schechter/\n1 SEX M\n1 BIRT\n2 DATE ABT 1877\n3 PHRASE about 65 on his Page of Testimony\n2 PLAC Jaz\u0142owiec, Buczacz, Galicia, Austria-Hungary\n1 OCCU Shochet\n2 PLAC Jaz\u0142owiec, Buczacz, Poland\n1 DEAT\n2 DATE ABT 1942\n3 PHRASE during the Holocaust\n2 PLAC Jaz\u0142owiec, Buczacz, Poland\n2 NOTE Murdered in the Holocaust.\n2 SOUR @S8@\n3 PAGE 54214/14\n1 EXID 13456005\n2 TYPE https://collections.yadvashem.org/en/names/\n1 FAMC @F5@\n0 @I19@ INDI\n1 NAME Golda /Schechter/\n1 NAME Golda /Kampfer/\n2 TYPE MARRIED\n1 SEX F\n1 BIRT\n2 DATE BET 1868 AND 1880\n3 PHRASE estimated from her siblings' births; her Page of Testimony says \"about 48\" (c. 1894), which is probably wrong\n2 PLAC Jaz\u0142owiec, Buczacz, Galicia, Austria-Hungary\n1 OCCU Housewife\n1 DEAT\n2 DATE ABT 1942\n3 PHRASE during the Holocaust\n2 PLAC Jaz\u0142owiec, Buczacz, Poland\n2 NOTE Murdered in the Holocaust.\n2 SOUR @S8@\n3 PAGE 54214/1(?), possibly /10\n1 EXID 507204\n2 TYPE https://collections.yadvashem.org/en/names/\n1 NOTE Probably the mother of Perel Gutman (working hypothesis). Her page's age of 48 would make her younger than Perel, but it is almost certainly wrong: Ester Lea's children began c. 1867, and Berta Auerbach's ages are off elsewhere (Wolf's by up to 14 years, Chane's by about 5).\n1 FAMC @F5@\n1 FAMS @F8@\n0 @I20@ INDI\n1 NAME Yosef /Kampfer/\n1 SEX M\n1 NOTE Working hypothesis (Oct 2026): Golda Schechter's husband, by religious rite only, so their daughter Perel was registered under her mother's surname, Schechter. Known only as Perel's father on her Page of Testimony, where his double given name ends in Yosef (first part unreadable) and no surname is given; \"Kampfer\" is Golda's married name on her own page. Alternative reading: Perel's father was a Sch\u00e4chter son, Yosef, whose wife was a different Golda.\n1 FAMS @F8@\n0 @I21@ INDI\n1 NAME Ruchla /Schwartz/\n1 NAME Rachel /Kohn-Schechter/\n2 TYPE MARRIED\n1 SEX F\n1 BIRT\n2 DATE ABT 1876\n3 PHRASE age about 36 in 1912\n2 PLAC Burkan\u00f3w, Podhajce, Galicia, Austria-Hungary\n2 NOTE Her Page of Testimony gives Chorostk\u00f3w, which the marriage record contradicts.\n2 SOUR @S9@\n1 DEAT\n2 DATE ABT 1942\n3 PHRASE during the Holocaust\n2 PLAC Synow\u00f3dzko Wy\u017cne, Stryj, Poland\n2 NOTE Murdered in the Holocaust.\n2 SOUR @S8@\n3 PAGE 54214/12\n1 EXID 1662085\n2 TYPE https://collections.yadvashem.org/en/names/\n1 FAMC @F7@\n1 FAMS @F6@\n0 @I22@ INDI\n1 NAME Abraham /Schwartz/\n1 SEX M\n1 FAMS @F7@\n0 @I23@ INDI\n1 NAME Fanny /Scharf/\n1 SEX F\n1 NOTE First name uncertain.\n1 FAMS @F7@\n0 @I26@ INDI\n1 NAME Perel /Schechter/\n1 NAME Perel /Gutman/\n2 TYPE MARRIED\n1 SEX F\n1 BIRT\n2 DATE ABT 1897\n3 PHRASE about 45 on her Page of Testimony\n2 PLAC Jaz\u0142owiec, Buczacz, Galicia, Austria-Hungary\n1 OCCU Housewife\n1 DEAT\n2 DATE ABT 1942\n3 PHRASE during the Holocaust\n2 PLAC Mielnica, Borszcz\u00f3w, Poland\n2 NOTE Murdered in the Holocaust.\n2 SOUR @S8@\n3 PAGE 54214/11(?)\n1 EXID 494011\n2 TYPE https://collections.yadvashem.org/en/names/\n1 FAMC @F8@\n2 _CONF PROBABLE\n2 NOTE Probable (working hypothesis): her page names her parents as Golda and a [?] Yosef, and gives her surname as Schechter, which fits a religious-only marriage of Golda Schechter and Yosef Kampfer. Berta Auerbach filed for both women, possibly on consecutive pages (54214/10 and /11). The alternative, that her father was a Sch\u00e4chter son Yosef with a different wife Golda, is not ruled out.\n1 FAMS @F10@\n0 @I27@ INDI\n1 NAME Hirsch /Gutman/\n1 SEX M\n1 BIRT\n2 DATE ABT 1897\n3 PHRASE about 45 on his Page of Testimony\n1 OCCU Merchant\n2 DATE 1936\n2 PLAC Mielnica, Borszcz\u00f3w, Poland\n1 DEAT\n2 DATE ABT 1942\n3 PHRASE during the Holocaust\n2 PLAC Mielnica, Borszcz\u00f3w, Poland\n2 NOTE Murdered in the Holocaust.\n2 SOUR @S8@\n1 EXID 342982\n2 TYPE https://collections.yadvashem.org/en/names/\n1 NOTE Parents: Shalom-[?] and Rivka.\n1 FAMS @F10@\n0 @I28@ INDI\n1 NAME Leib /Gutman/\n1 SEX M\n1 BIRT\n2 DATE ABT 1921\n3 PHRASE age 21 on his Page of Testimony\n2 PLAC Mielnica, Borszcz\u00f3w, Poland\n1 OCCU Merchant\n1 DEAT\n2 DATE ABT 1942\n3 PHRASE during the Holocaust\n2 PLAC Mielnica, Borszcz\u00f3w, Poland\n2 NOTE Murdered in the Holocaust.\n2 SOUR @S8@\n1 EXID 362090\n2 TYPE https://collections.yadvashem.org/en/names/\n1 FAMC @F10@\n0 @I29@ INDI\n1 NAME Moshe /Gutman/\n1 SEX M\n1 BIRT\n2 DATE ABT 1922\n3 PHRASE age 19-20 on his Page of Testimony\n2 PLAC Mielnica, Borszcz\u00f3w, Poland\n1 OCCU Student\n1 DEAT\n2 DATE ABT 1942\n3 PHRASE during the Holocaust\n2 PLAC Mielnica, Borszcz\u00f3w, Poland\n2 NOTE Murdered in the Holocaust.\n2 SOUR @S8@\n3 PAGE 54214/9\n1 EXID 990230\n2 TYPE https://collections.yadvashem.org/en/names/\n1 FAMC @F10@\n0 @I30@ INDI\n1 NAME Fishel /Gutman/\n1 SEX M\n1 BIRT\n2 DATE ABT 1924\n3 PHRASE age 18 on his Page of Testimony\n2 PLAC Mielnica, Borszcz\u00f3w, Poland\n1 OCCU Pupil\n1 DEAT\n2 DATE ABT 1942\n3 PHRASE during the Holocaust\n2 PLAC Mielnica, Borszcz\u00f3w, Poland\n2 NOTE Murdered in the Holocaust.\n2 SOUR @S8@\n1 EXID 623381\n2 TYPE https://collections.yadvashem.org/en/names/\n1 FAMC @F10@\n0 @I31@ INDI\n1 NAME Marcus /Karniol/\n1 NAME Mordechai /Karniol/\n2 TYPE AKA\n2 NOTE Probable Hebrew name; Marcus usually stands for Mordechai.\n1 NAME Marcus /Karmel/\n2 TYPE AKA\n2 NOTE As written on daughter Yetta's 1925 marriage record.\n1 SEX M\n1 BIRT\n2 DATE ABT 1842\n3 PHRASE age 32 at death\n1 DEAT\n2 DATE 1 MAY 1874\n2 PLAC Tarnopol, Galicia, Austria-Hungary\n2 NOTE House no. 653. Cause: consumption (Lungensucht). The register gives no parents, spouse or occupation.\n2 SOUR @S23@\n3 PAGE Deaths 1874, akta 158 (register p. 158)\n1 NOTE Yetta's father is documented as Markus (Mordche) Karniol, husband of Reise Lea, in the Tarnopol births of her children (1884, 1886, 1889) and of her sister Scheindel's (1891, 1893). This Marcus, who died in 1874 aged 32, is identified with him by name, age and town only; the death entry names no family. If right, Lazar (b. c. 1873) was born shortly before his death and named his own first son Markus (1902) for him.\n1 FAMS @F11@\n0 @I32@ INDI\n1 NAME Retzie Lea /Lifsch\u00fctz/\n1 NAME Retzie Lea /Karniol/\n2 TYPE MARRIED\n1 NAME Rose /Tofer/\n2 TYPE AKA\n2 NOTE As read on daughter Yetta's 1925 marriage record; \"Tofer\" uncertain.\n1 NAME Reise Lea /Saphier/\n2 TYPE AKA\n2 NOTE Maiden name as given on her 1937 death record; the 1930s residents card gives Lifsch\u00fctz.\n1 NAME Reise Lea /Karnel/\n2 TYPE AKA\n2 NOTE As the mother of Yetta (Jente Ziwje) and Scheindel in Tarnopol births 1884-1893 (also Reisy Ley, Reisli, Reise Lea Karniol). Identified with Retzie Lea of the 1930s card by name and her presence in Lazar's household.\n1 SEX F\n1 BIRT\n2 DATE 15 JAN 1847\n2 PLAC Tarnopol, Galicia, Austria-Hungary\n2 NOTE Tarnopol birth index book: Reise Lea Saphier, father Mendel. Her 1937 death record gives the 15th, 1847; the 1930s card's 5 Jun 1843 is evidently wrong.\n2 SOUR @S25@\n1 RESI House no. 181\n2 DATE 1890\n2 PLAC Tarnopol, Galicia, Austria-Hungary\n2 NOTE As \"Reisie Saphier\", born 1845. The same house where Yetta's baby Moses Mendel died in Mar 1890, and where Sacharje Mendel Saphier's daughter Kreisel was born in 1852.\n2 SOUR @S26@\n1 RESI\n2 DATE FROM 1922\n3 PHRASE listed in the 1930s Tarnopol residents records\n2 PLAC Tarnopol, Tarnopol, Poland\n2 SOUR @S6@\n1 NOTE Daughter of Mendel and Jente Lifsch\u00fctz (All Galicia Database, Tarnopol). A Mendel Lifsch\u00fctz, with a (later?) wife Chaje Ziprik (d. 1898, aged 59), had children in Tarnopol in 1867\u201368 (JRI-Poland). Yetta's 1947 death certificate gives her parents as \"Mendel\" and \"Yetta Karniel\", probably Retzie Lea's own parents' names.\n1 DEAT\n2 DATE 3 OCT 1937\n2 PLAC ul. Czackiego 46a, Tarnopol, Tarnopol, Poland\n2 NOTE Address written 46a (twice); the 1930s card has 26a. 6 a.m.; widow; senile decline; buried 4 Oct 1937. Recorded as Reise Lea Saphier, married Karniol, daughter of Mendel and Jente, living with family.\n2 SOUR @S24@\n3 PAGE 1937, p. 35, entry 171\n1 FAMC @F17@\n1 FAMS @F11@\n0 @I33@ INDI\n1 NAME Yetta /Karniol/\n1 NAME Jettie /Karniol/\n2 TYPE AKA\n2 NOTE On son Emanuel's 1892 birth certificate.\n1 NAME Yette /Karniel/\n2 TYPE AKA\n1 NAME Yetta /Rubrum/\n2 TYPE MARRIED\n1 NAME Yetta /Halpern/\n2 TYPE MARRIED\n1 NAME Jente Ziwje /Karnel/\n2 TYPE AKA\n2 NOTE As recorded in Tarnopol 1884\u20131890 (also Jenty Ciwje); Hebrew probably Yente Tzivia. Her children there were registered under her surname, Karnel, a sign of a religious-only marriage.\n1 SEX F\n1 BIRT\n2 DATE ABT 1863\n3 PHRASE 27 in Jul 1892; May 1864 in the 1900 census; 1863 on her death certificate\n2 PLAC Tarnopol, Galicia, Austria-Hungary\n2 SOUR @S12@\n1 IMMI\n2 DATE ABT 1890\n2 PLAC New York, New York, USA\n2 NOTE 1890 in the 1900, 1920 and 1930 censuses; 1889 in 1910; \"35 years in U.S.\" in 1925. Not on Isaac and Max's Nov 1890 Noordland page, so she probably came separately. Her manifest is not found under Rubrum, Karniol, Karmel or Karniel (Oct 2026). Still an alien in 1920 and 1930.\n2 SOUR @S13@\n1 RESI 805 E. Tremont Ave\n2 DATE 1925\n2 PLAC Bronx, New York, USA\n2 SOUR @S15@\n1 RESI 1980 [street not read]\n2 DATE 1930\n2 PLAC Bronx, New York, USA\n2 NOTE Widowed, head of household, with boarders Joseph and Pearl Weiss. Indexed as Yetta Rubenim (also Rubeum), 65, born Poland.\n2 SOUR @S22@\n1 DEAT\n2 DATE 24 NOV 1947\n2 PLAC Golden Convalescent Home, Bronx, New York, USA\n2 NOTE Widow of Isaac; last address 1467 Marmion Ave. Buried 25 Nov 1947, Union Field Cemetery. Informant: son Max Rubrum, 1057 Hoe Ave.\n2 SOUR @S16@\n1 NOTE Clara's aunt (very probable; see Lazar). Clara's January 1921 manifest names Yetta's son Emanuel as the cousin she was joining.\n1 NOTE Possible great-grandchildren, all unconfirmed (public records): Keith D. Rubrum (b. 1954), Lesley Rubrum (b. 1954), Andrea (Blumkin) Rubrum (b. 1950), Erica C. Rubrum (b. 1965), Daniel Rubrum (b. 1979). Obituaries for Walter (2013), Celeste (2018) and Rhoda (2018) Rubrum would name them.\n1 FAMC @F11@\n2 NOTE Documented: her children's Tarnopol births (1884 akta 281, 1886 akta 428, 1889 akta 343) name her as daughter of Mordche/Markus and Reise Lea Karnel, matching her 1925 marriage (Marcus and Rose). That this Reise Lea is Retzie Lea Lifsch\u00fctz (b. 1843), and this Markus the one who died in 1874, is probable.\n1 FAMS @F12@\n1 FAMS @F13@\n0 @I34@ INDI\n1 NAME Isaac /Rubrum/\n2 TRAN \u05d9\u05e6\u05d7\u05e7\n3 LANG he\n1 NAME Isidor /Rubrum/\n2 TYPE AKA\n1 NAME Isaac /Ruberom/\n2 TYPE AKA\n2 NOTE As written on his 1890 arrival manifest.\n1 SEX M\n1 BIRT\n2 DATE ABT 1847\n3 PHRASE 45 in Jul 1892; Jan 1851 in the 1900 census; 1846 on his death certificate\n2 PLAC Tarnopol, Galicia, Austria-Hungary\n2 SOUR @S12@\n1 IMMI\n2 DATE 21 NOV 1890\n2 PLAC New York, New York, USA\n2 NOTE S.S. Noordland from Antwerp, as Isaac Ruberom, 40, with son \"Marcus\" (Max), 4.\n2 SOUR @S18@\n1 OCCU Peddler; later dry-goods salesman and businessman\n2 PLAC New York, New York, USA\n1 RESI 48 Essex St\n2 DATE 1900\n2 PLAC Manhattan, New York, USA\n2 SOUR @S13@\n1 DEAT\n2 DATE 12 JAN 1924\n2 PLAC 853 E. 170th St, Bronx, New York, USA\n2 NOTE Buried 13 Jan 1924, Mount Zion Cemetery, Maspeth, in the Tarnopoler society plot (JewishGen JOWBR), beside Nathan Rubrum. The certificate gives his father as Jacob; the gravestone reads \u05e8' \u05d9\u05e6\u05d7\u05e7 \u05d1\u05e8 \u05de\u05e8\u05d3\u05db\u05d9 (son of Mordechai).\n2 SOUR @S14@\n1 EXID 147678996\n2 TYPE https://www.findagrave.com/memorial/\n1 NOTE Declaration of intention, S.D.N.Y., 20 Jul 1897 (22 Ludlow St). An earlier wife, [?] Katz, was the mother of Sarah (Sadie) Rubrum (b. 1876, Galicia; m. Rachmiel Lang, Manhattan, 1900). Nathan (Nachman) Rubrum (d. 1922), buried beside him at Mount Zion, was almost certainly his brother: both named a son Markus in 1886 and 1889, after their father. Their father was probably Mordche Rubrum, laborer, widower, who died in Tarnopol on 14 Nov 1880 aged 74, at house no. 961 (deaths 1880, akta 374). Isaac's first wife was Nehamke Beyle Katz; their children, born in Tarnopol, were Boruch (b. and d. 1873, aged 6 months) and Sara Jutta (b. 1874, later Sadie Lang).\n1 FAMS @F12@\n0 @I35@ INDI\n1 NAME Max /Rubrum/\n1 NAME Marcus /Ruberom/\n2 TYPE AKA\n2 NOTE As written on the 1890 manifest.\n1 NAME Markus /Karnel/\n2 TYPE BIRTH\n2 NOTE Birth registered under his mother's surname.\n1 SEX M\n1 BIRT\n2 DATE 8 SEP 1886\n2 PLAC Tarnopol, Galicia, Austria-Hungary\n2 NOTE Registered as Markus, son of Isaac Rubrum (dealer) and Jente Ziwje Karnel, house no. 1529; circumcised 21 Sep 1886. The birth day is on the facing page, not in the scan read; 8 Sep is from the index.\n2 SOUR @S23@\n3 PAGE Births 1886, akta 428\n1 IMMI\n2 DATE 21 NOV 1890\n2 PLAC New York, New York, USA\n2 NOTE With his father, S.S. Noordland.\n2 SOUR @S18@\n1 RESI 1057 Hoe Ave\n2 DATE 1947\n2 PLAC Bronx, New York, USA\n2 SOUR @S16@\n1 FAMC @F12@\n1 FAMS @F14@\n0 @I36@ INDI\n1 NAME Ida /Edwards/\n1 NAME Ida /Rubrum/\n2 TYPE MARRIED\n1 SEX F\n1 BIRT\n2 DATE ABT 1892\n2 PLAC Altoona, Pennsylvania, USA\n2 SOUR @S17@\n1 FAMS @F14@\n0 @I37@ INDI\n1 NAME Murray /Rubrum/\n1 SEX M\n1 BIRT\n2 DATE 18 OCT 1917\n2 PLAC Bronx, New York, USA\n1 NOTE Registered for the WWII draft in 1940. Public records place a Murray Rubrum in Queens in 2002.\n1 FAMC @F14@\n0 @I38@ INDI\n1 NAME Evelyn /Rubrum/\n1 SEX F\n1 BIRT\n2 DATE ABT 1923\n2 PLAC Bronx, New York, USA\n1 NOTE Married name unknown.\n1 FAMC @F14@\n0 @I39@ INDI\n1 NAME Emanuel /Rubrum/\n1 NAME Mendel /Rubrum/\n2 TYPE AKA\n1 NAME Emanuel /Rutrum/\n2 TYPE AKA\n2 NOTE As typed on Clara's 1921 manifest.\n1 SEX M\n1 BIRT\n2 DATE 20 JUL 1892\n2 PLAC 22 Ridge St, Manhattan, New York, USA\n2 NOTE His WWI draft card gives 23 Jul 1892.\n2 SOUR @S12@\n1 OCCU Ladies' fur store owner\n2 DATE 1930\n2 PLAC Bronx, New York, USA\n2 SOUR @S19@\n1 RESI 805 Tremont Ave\n2 DATE 1930\n2 PLAC Bronx, New York, USA\n2 SOUR @S19@\n1 RESI Marmion Ave\n2 DATE 1940\n2 PLAC Bronx, New York, USA\n2 SOUR @S20@\n1 DEAT\n2 DATE 18 MAR 1977\n2 PLAC Flushing, Queens, New York, USA\n2 NOTE Last residence per the Social Security Death Index. Buried Wellwood Cemetery, West Babylon (Hillcrest Benevolent Assn plot).\n1 NOTE The cousin Clara joined on arrival in January 1921, at 805 Tremont Ave, Bronx. Clara's first cousin if Yetta and Lazar were siblings.\n1 FAMC @F12@\n1 FAMS @F15@\n0 @I40@ INDI\n1 NAME Minnie /Schrendorf/\n1 NAME Minnie /Rubrum/\n2 TYPE MARRIED\n1 SEX F\n1 DEAT\n2 DATE 11 APR 1981\n2 NOTE Buried beside Emanuel, Wellwood Cemetery, West Babylon (Hillcrest Benevolent Assn plot, Sec. 2, Block 26, grave 2), per Find a Grave.\n1 FAMS @F15@\n0 @I41@ INDI\n1 NAME Robert Irwin /Rubrum/\n1 NAME Irving /Rubrum/\n2 TYPE AKA\n1 SEX M\n1 BIRT\n2 DATE 2 APR 1924\n2 PLAC Long Branch, New Jersey, USA\n1 DEAT\n2 DATE 30 NOV 2011\n2 PLAC Delray Beach, Florida, USA\n1 NOTE Veteran. Earlier lived in Fort Lee, N.J. and Fresh Meadows, Queens. Probably the husband of Celeste Rubrum (1929\u20132018).\n1 FAMC @F15@\n0 @I42@ INDI\n1 NAME Franklin /Rubrum/\n1 SEX M\n1 BIRT\n2 DATE 19 JUN 1931\n1 DEAT\n2 DATE 11 MAR 1932\n2 PLAC Bronx, New York, USA\n2 SOUR @S21@\n1 FAMC @F15@\n0 @I43@ INDI\n1 NAME Walter /Rubrum/\n1 SEX M\n1 BIRT\n2 DATE ABT 1934\n2 SOUR @S20@\n1 DEAT\n2 DATE 10 AUG 2013\n1 NOTE Rhoda Rubrum (d. 2018) may have been his wife.\n1 FAMC @F15@\n0 @I44@ INDI\n1 NAME Bassie /Karnel/\n1 NAME Bassie /Rubrum/\n2 TYPE AKA\n1 SEX F\n1 BIRT\n2 DATE 1 JUN 1884\n3 PHRASE day could be 7\n2 PLAC Tarnopol, Galicia, Austria-Hungary\n2 NOTE House no. 1562 (or 1560); named 9 Jun. Father Isaac Rabram, laborer, acknowledged paternity.\n2 SOUR @S23@\n3 PAGE Births 1884, akta 281\n1 DEAT\n2 DATE 8 AUG 1885\n2 PLAC Tarnopol, Galicia, Austria-Hungary\n2 NOTE Aged 1; cholerine; house no. 1560; buried 10 Aug.\n2 SOUR @S23@\n3 PAGE Deaths 1885, akta 316\n1 FAMC @F12@\n0 @I45@ INDI\n1 NAME Moses Mendel /Karnel/\n1 NAME Moses Mendel /Rubrum/\n2 TYPE AKA\n1 SEX M\n1 BIRT\n2 DATE 8 JUL 1889\n2 PLAC Tarnopol, Galicia, Austria-Hungary\n2 NOTE House no. 133; circumcised 21 Jul.\n2 SOUR @S23@\n3 PAGE Births 1889, akta 343\n1 DEAT\n2 DATE 7 MAR 1890\n2 PLAC Tarnopol, Galicia, Austria-Hungary\n2 NOTE Aged 8 months; pneumonia; house no. 181. His death shows Yetta was still in Tarnopol in 1890. Emanuel, born 1892, was given the Yiddish name Mendel after him.\n2 SOUR @S23@\n3 PAGE Deaths 1890, akta 83\n1 FAMC @F12@\n0 @I46@ INDI\n1 NAME Scheindel /Karniol/\n1 SEX F\n1 NOTE Unmarried; daughter of Markus and Reise Lea Karniol per both her children's births. Yetta's sister. Birth year unknown; possibly the \"Scheindel Saphier\", born 1870, at house no. 315 in the 1890 Tarnopol census index (under her mother's surname; unconfirmed).\n1 RESI\n2 DATE 1893\n2 PLAC Tarnopol, Galicia, Austria-Hungary\n2 NOTE House no. 182 (or 183); no. 2004 in 1891.\n1 FAMC @F11@\n1 FAMS @F16@\n0 @I47@ INDI\n1 NAME Matel /Karniol/\n1 SEX F\n1 BIRT\n2 DATE 26 AUG 1891\n2 PLAC Tarnopol, Galicia, Austria-Hungary\n2 NOTE House no. 2004; named 29 Aug. Jakob Nachwalter acknowledged paternity.\n2 SOUR @S23@\n3 PAGE Births 1891, akta 415\n1 FAMC @F16@\n0 @I48@ INDI\n1 NAME Jacob Isaac /Karniol/\n1 SEX M\n1 BIRT\n2 DATE 21 APR 1893\n2 PLAC Tarnopol, Galicia, Austria-Hungary\n2 NOTE House no. 182 (or 183); circumcised 28 Apr. No father acknowledged.\n2 SOUR @S23@\n3 PAGE Births 1893, akta 206\n1 FAMC @F16@\n0 @F16@ FAM\n1 HUSB @VOID@\n2 PHRASE Jakob (Jacob Isaac) Nachwalter, laborer, d. 9 Oct 1892 aged 28, married, at house no. 181, Tarnopol (deaths 1892, akta 300)\n1 NOTE Probably a religious-only marriage: Jacob Isaac was recorded as married at his death while Scheindel was single in the civil births, and he died in the Saphier house, no. 181. Jakob Nachwalter acknowledged Matel (1891). Jacob Isaac Nachwalter died in 1892, and Scheindel's son born Apr 1893 was named Jacob Isaac, evidently after his late father; hence no father acknowledged him.\n1 WIFE @I46@\n1 CHIL @I47@\n1 CHIL @I48@\n1 SNOTE @N1@\n0 @I49@ INDI\n1 NAME Mendel /Saphier/\n1 NAME Mendel /Lifsch\u00fctz/\n2 TYPE AKA\n2 NOTE As on his daughter's 1930s residents card. Saphier is supported by her 1847 birth index entry and her 1937 death record.\n1 SEX M\n1 NOTE Of Tarnopol. Named as Reise Lea's father in her 1847 birth index entry, her 1930s card and her 1937 death record. Possibly Sacharje (Zachary) Mendel Saphier, b. 26 Jan 1824, the \"Mendel Safir\" who died in Tarnopol on 15 Feb 1880 aged 58, married, a servant in the liquor trade, at house no. 228 (deaths 1880, akta 66), next to no. 229 where Sacharje Mendel's wife Esther (b. 1832) was a widow in 1880; she bore him Samuel (1850), Kreisel (1852, at no. 181), Jona (1856), Wittie (1862) and Abraham Leib (1870). If so, Jente was a first wife who died c. 1847-49. At least two Mendel Saphiers lived in Tarnopol: another had a son Chaim Wolf in Apr 1847, and Sara Saphir (b. c. 1848, daughter of Mendel and Taube) cannot easily share a father with Reise Lea (b. Jan 1847) by a different mother. Sara lived at no. 181 in Jan 1889 and Reise Lea in 1890, so the two Mendels were probably close kin. Not proven which Mendel is Reise Lea's.\n1 FAMS @F17@\n0 @I50@ INDI\n1 NAME Jente //\n1 NAME Jente /Lifsch\u00fctz/\n2 TYPE AKA\n2 NOTE As on her daughter's 1930s card; may be her married name only.\n1 SEX F\n1 NOTE Named as Reise Lea's mother on her 1930s card and her 1937 death record. Her granddaughter Yetta (Jente Ziwje, b. c. 1863) was evidently named for her, which suggests she had died by then.\n1 FAMS @F17@\n0 @F17@ FAM\n1 HUSB @I49@\n1 WIFE @I50@\n1 CHIL @I32@\n1 NOTE Parents' given names agree in both records; the surname does not (Lifsch\u00fctz on the 1930s card, Saphier on the 1937 death record).\n0 @F1@ FAM\n1 HUSB @I1@\n1 WIFE @I2@\n1 CHIL @I3@\n1 CHIL @I4@\n1 CHIL @I5@\n1 MARR\n2 DATE 20 MAR 1926\n2 PLAC Bronx, New York, USA\n2 SOUR @S3@\n3 PAGE Certificate 1928\n0 @F2@ FAM\n1 HUSB @I6@\n1 WIFE @I7@\n1 CHIL @I1@\n1 MARR\n2 SNOTE @N1@\n2 SOUR @S1@\n0 @F3@ FAM\n1 HUSB @I8@\n1 WIFE @I9@\n1 CHIL @I61@\n1 CHIL @I10@\n1 CHIL @I7@\n1 CHIL @I62@\n1 CHIL @I63@\n0 @F4@ FAM\n1 HUSB @I11@\n1 WIFE @I12@\n1 CHIL @I2@\n1 CHIL @I13@\n1 CHIL @I14@\n0 @F5@ FAM\n1 HUSB @I15@\n1 WIFE @I16@\n1 CHIL @I17@\n1 CHIL @I12@\n1 CHIL @I18@\n1 CHIL @I19@\n1 MARR\n2 SNOTE @N1@\n2 SOUR @S9@\n0 @F6@ FAM\n1 HUSB @I17@\n1 WIFE @I21@\n1 MARR\n2 DATE 19 MAY 1912\n2 PLAC Skole, Stryj, Galicia, Austria-Hungary\n2 SOUR @S9@\n3 PAGE Record 8, page 5\n0 @F7@ FAM\n1 HUSB @I22@\n1 WIFE @I23@\n1 CHIL @I21@\n1 MARR\n2 SNOTE @N1@\n2 SOUR @S9@\n0 @F8@ FAM\n1 HUSB @I20@\n1 WIFE @I19@\n1 MARR\n2 SNOTE @N1@\n1 CHIL @I26@\n0 @F10@ FAM\n1 HUSB @I27@\n1 WIFE @I26@\n1 CHIL @I28@\n1 CHIL @I29@\n1 CHIL @I30@\n1 NOTE Seven children in all; four not yet identified.\n0 @F11@ FAM\n1 HUSB @I31@\n1 WIFE @I32@\n1 CHIL @I11@\n1 CHIL @I33@\n1 CHIL @I46@\n1 NOTE Yetta and Scheindel are documented children (Tarnopol births 1884-1893). Lazar is a very probable child.\n0 @F12@ FAM\n1 HUSB @I34@\n1 WIFE @I33@\n1 CHIL @I44@\n1 CHIL @I35@\n1 CHIL @I45@\n1 CHIL @I39@\n1 MARR\n2 DATE ABT 1882\n3 PHRASE married 28 years in 1910; about 15 years in 1900\n2 SOUR @S13@\n1 NOTE Religious marriage: the Tarnopol births are registered under Yetta's surname, Karnel. Four children born by 1900, two living (1900 census): Bassie, Max, Moses Mendel and Emanuel.\n0 @F13@ FAM\n1 HUSB @VOID@\n2 PHRASE Solomon Halpern (b. c. 1863, Russia; widower)\n1 WIFE @I33@\n1 MARR\n2 DATE 12 SEP 1925\n2 PLAC Brooklyn, New York, USA\n2 NOTE Yetta gave her parents as Marcus Karmel and Rose Tofer [?].\n2 SOUR @S15@\n0 @F14@ FAM\n1 HUSB @I35@\n1 WIFE @I36@\n1 CHIL @I37@\n1 CHIL @I38@\n1 MARR\n2 DATE 2 JUL 1916\n2 PLAC Manhattan, New York, USA\n2 NOTE Max's parents given as Isaac Rubrum and Yette Karniel.\n2 SOUR @S17@\n0 @F15@ FAM\n1 HUSB @I39@\n1 WIFE @I40@\n1 CHIL @I41@\n1 CHIL @I42@\n1 CHIL @I43@\n1 MARR\n2 DATE ABT 1923\n2 NOTE Record not found; possibly in New Jersey (son Robert Irwin born in Long Branch, 1924).\n0 @F18@ FAM\n1 HUSB @I13@\n1 WIFE @I59@\n1 CHIL @I60@\n1 MARR\n2 DATE 17 JUL 1932\n2 PLAC Buczacz, Tarnopol, Poland\n2 NOTE By Feiwel(?) Willig, rabbi in Buczacz. Groom: merchant, born \"reportedly\" 1902 in Jaz\u0142owiec, living in Tarnopol, son of the late Alazar Karniol and Chana n\u00e9e Sch\u00e4chter of Tarnopol; excused from producing a birth certificate. Bride: \"ritual daughter\" of the late Chana Friedman of Buczacz. Witnesses Aron Hausner(?) of \u017bnibrody and Berl Gelbard, merchant.\n2 SOUR @S27@\n3 PAGE Marriages 1932, p. 98, akta 7 (scans 0048-0049)\n0 @S1@ SOUR\n1 TITL Chorostk\u00f3w Jewish birth register, 1894\n1 PUBL AGAD Warsaw, Fond 300, file 1969, scan 0142\n0 @S2@ SOUR\n1 TITL Passenger manifest, S.S. Celtic, Liverpool to New York, arrived 10 Oct 1921\n1 PUBL List 9, line 16\n0 @S3@ SOUR\n1 TITL Certificate and Record of Marriage No. 1928, Bronx, 1926\n1 PUBL City of New York, Department of Health\n0 @S4@ SOUR\n1 TITL 1930 U.S. census, Bronx, New York\n1 PUBL ED 3-522, sheet 8B, lines 92-95\n0 @S5@ SOUR\n1 TITL Petition for Naturalization No. 367372, U.S. District Court, S.D.N.Y., 1940-41\n0 @S6@ SOUR\n1 TITL Tarnopol Jewish Residents (1930s)\n1 PUBL AGAD Warsaw, Fond 424, File 160, p. 92; All Galicia Database\n0 @S7@ SOUR\n1 TITL Tarnopol Jewish Deaths 1929-1930\n1 PUBL TsDIAL Lviv, Fond 701, Series 1, File 338, record 143\n0 @S8@ SOUR\n1 TITL Yad Vashem Pages of Testimony, batch 54214, submitted by Berta Auerbach, 15 Dec 1956\n1 PUBL Yad Vashem Central Database of Shoah Victims' Names\n0 @S9@ SOUR\n1 TITL Skole Jewish marriages 1912\n1 PUBL AGAD Warsaw, Fond 300, sygnatura 3043\n0 @S10@ SOUR\n1 TITL Galicia 1891 Business Directory (JewishGen)\n0 @S11@ SOUR\n1 TITL Passenger manifest, S.S. Carmania, Liverpool to New York, arrived 24 Jan 1921\n1 PUBL NARA T715, roll 2915, frames 831-832; Ellis Island ID J6KQ-DQQ\n1 WWW https://www.familysearch.org/ark:/61903/1:1:J6KQ-DQQ\n0 @S12@ SOUR\n1 TITL Birth certificate of Emanuel Rubrum, Manhattan, 20 Jul 1892, no. 27351\n1 PUBL NYC Municipal Archives, Historical Vital Records (view/545264)\n0 @S13@ SOUR\n1 TITL 1900 U.S. census, Manhattan, New York\n1 PUBL 48 Essex St, ED 173, page 8\n0 @S14@ SOUR\n1 TITL Death certificate of Isaac Rubrum, Bronx, 12 Jan 1924, no. 293\n1 PUBL NYC Municipal Archives, Historical Vital Records (view/5621697)\n0 @S15@ SOUR\n1 TITL Marriage certificate of Solomon Halpern and Yetta Rubrum, Brooklyn, 12 Sep 1925, no. 13943\n1 PUBL NYC Municipal Archives, Historical Vital Records (view/9720481)\n0 @S16@ SOUR\n1 TITL Death certificate of Yetta Rubrum, Bronx, 24 Nov 1947, no. 11447\n1 PUBL NYC Municipal Archives, Historical Vital Records (view/7367300); FamilySearch 2WLN-3MQ\n0 @S17@ SOUR\n1 TITL Marriage certificate of Max Rubrum and Ida Edwards, Manhattan, 2 Jul 1916, no. 16244\n1 PUBL NYC Municipal Archives, Historical Vital Records (view/8836020)\n0 @S18@ SOUR\n1 TITL Passenger manifest, S.S. Noordland, Antwerp to New York, arrived 21 Nov 1890\n1 PUBL NARA M237, roll 559 (Ancestry image NYM237_559-0098)\n0 @S19@ SOUR\n1 TITL 1930 U.S. census, Bronx, New York\n1 PUBL AD 7, 805 Tremont Ave, page 11A\n0 @S20@ SOUR\n1 TITL 1940 U.S. census, Bronx, New York\n1 PUBL Marmion Ave, ED 3-1151, page 1A\n0 @S21@ SOUR\n1 TITL NYC death record of Franklin Rubrum, Bronx, 11 Mar 1932\n0 @S22@ SOUR\n1 TITL 1930 U.S. census, Bronx, New York\n1 PUBL AD 7, ED 529, page 3B (Yetta Rubrum indexed as Rubenim)\n0 @S23@ SOUR\n1 TITL Tarnopol Jewish births, marriages and deaths (index)\n1 PUBL AGAD Warsaw, Fond 300; JRI-Poland index (Tarnopol PSA)\n0 @S24@ SOUR\n1 TITL Tarnopol Jewish deaths 1937 (Ksi\u0119ga zmar\u0142ych)\n0 @S25@ SOUR\n1 TITL Tarnopol Jewish births, index book (1816-1860)\n1 PUBL Gesher Galicia, All Galicia Database\n0 @S26@ SOUR\n1 TITL Tarnopol Jewish census, index book (1890)\n1 PUBL Gesher Galicia, All Galicia Database\n0 @S27@ SOUR\n1 TITL Buczacz Jewish marriages (index)\n1 PUBL AGAD Warsaw, Fond 300, sygn. 4074; JRI-Poland index\n0 @S28@ SOUR\n1 TITL Chorostk\u00f3w Jewish births (index)\n1 PUBL AGAD Warsaw, Fond 300; JRI-Poland index (births 1830-47, 1857-71, 1874-98)\n0 @I51@ INDI\n1 NAME Sara Ester /Roth/\n1 SEX F\n1 FAMS @F19@\n1 NOTE Roth (Rother), of Grzyma\u0142\u00f3w. Named as mother in her children's Chorostk\u00f3w birth entries (JRI-Poland index); called Ester on her son Dawid's 1943 Page of Testimony.\n0 @I52@ INDI\n1 NAME Israel /Sperling/\n1 SEX M\n1 BIRT\n2 DATE 24 APR 1889\n2 PLAC Chorostk\u00f3w, Husiatyn, Galicia, Austria-Hungary\n2 SOUR @S28@\n3 PAGE Birth register sygn. 1969, scan 0048\n1 DEAT\n2 DATE 15 MAR 1897\n2 PLAC Chorostk\u00f3w\n2 SOUR @S28@\n3 PAGE Margin note on birth entry B 40 (death register Band III, Blatt 217, Post 17)\n1 FAMC @F19@\n1 NOTE Died aged 7.\n0 @I53@ INDI\n1 NAME Moses Leib /Sperling/\n1 SEX M\n1 BIRT\n2 DATE 25 MAR 1891\n2 PLAC Chorostk\u00f3w, Husiatyn, Galicia, Austria-Hungary\n2 SOUR @S28@\n3 PAGE Birth register sygn. 1969, scan 0080\n1 DEAT\n2 DATE 8 OCT 1938\n2 PLAC Chorostk\u00f3w, Poland\n2 SOUR @S28@\n3 PAGE Margin note on birth entry B 27 (death register vol. II?, p. 31, no. 23)\n1 FAMC @F19@\n1 NOTE Hypothesis: husband of Hana (b. 1900) and father of Laizer (b. 1920) and Gitla, all of Chorostk\u00f3w, murdered at Be\u0142\u017cec in 1942 (Yad Vashem pages by Reuven Schuhfeld; Yizkor list \"Moshe, Chanah, Elezer & Gittel\" Sperling). Unproven.\n0 @I54@ INDI\n1 NAME Isak /Sperling/\n1 SEX M\n1 BIRT\n2 DATE 3 MAY 1894\n2 PLAC Chorostk\u00f3w, Husiatyn, Galicia, Austria-Hungary\n2 SOUR @S28@\n3 PAGE Birth register sygn. 1969, scan 0137\n1 DEAT\n2 DATE 20 SEP 1894\n2 PLAC Chorostk\u00f3w\n2 SOUR @S28@\n3 PAGE Margin note on birth entry B 34 (death register Band III, Blatt 182, Post 56)\n1 FAMC @F19@\n1 NOTE Died in infancy.\n0 @I55@ INDI\n1 NAME Chane /Sperling/\n1 SEX F\n1 BIRT\n2 DATE 27 FEB 1896\n2 PLAC Chorostk\u00f3w, Husiatyn, Galicia, Austria-Hungary\n2 SOUR @S28@\n3 PAGE Birth register sygn. 1969, scan 0182\n1 FAMC @F19@\n1 NOTE No death note on her birth entry. Not found in NY passenger lists, JRI-Poland or Gesher Galicia marriage indexes, or the Vienna Jewish registers (Oct 2026); probably married under another surname. Fate unknown.\n0 @I56@ INDI\n1 NAME Dawid /Sperling/\n1 SEX M\n1 BIRT\n2 DATE 17 FEB 1898\n2 PLAC Chorostk\u00f3w, Husiatyn, Galicia, Austria-Hungary\n2 SOUR @S28@\n2 SOUR @S30@\n1 OCCU Merchant\n2 PLAC Kopyczy\u0144ce, Tarnopol, Poland\n2 SOUR @S29@\n1 DEAT\n2 DATE 1943\n2 PLAC Poland\n2 NOTE Murdered in the Shoah; lived in Kopyczy\u0144ce before and during the war.\n2 SOUR @S29@\n3 PAGE Item 2030065: born Chorostk\u00f3w 1898 to Pinkhas and Ester\n1 FAMC @F19@\n1 FAMS @F20@\n1 NOTE Merchant in Kopyczy\u0144ce. Not the David Sperling (b. c. 1897, Chorostk\u00f3w) who arrived in New York in 1922; that man's uncles were Jachiel Scharf and Samuel Siegal, so he was the son of Boruch Sperling and Marjem Scharf.\n0 @I57@ INDI\n1 NAME Marjem /Weisglass/\n2 NICK Malka; Muncia Miriam\n1 SEX F\n1 BIRT\n2 DATE 1 MAR 1904\n2 PLAC Kopyczy\u0144ce, Tarnopol, Poland\n2 SOUR @S30@\n1 DEAT\n2 DATE 1943\n2 PLAC Kopyczy\u0144ce, Tarnopol, Poland\n2 NOTE Murdered in the Shoah.\n2 SOUR @S29@\n1 FAMS @F20@\n1 NOTE Daughter of Israel Elo and Chane Gittel Weisglass of Kopyczy\u0144ce. Yad Vashem pages by Shlomo Verber (as Muncia Miriam Sperling) and Eliezer Verber (as Malka Szperling n\u00e9e Weisglass).\n0 @I58@ INDI\n1 NAME Eliezer /Sperling/\n2 NICK Lion Lusio; Lusia\n1 SEX M\n1 BIRT\n2 DATE 1930\n2 PLAC Kopyczy\u0144ce, Tarnopol, Poland\n2 SOUR @S29@\n1 DEAT\n2 DATE 1943\n2 PLAC Kopyczy\u0144ce, Tarnopol, Poland\n2 NOTE Murdered in the Shoah, aged 13.\n2 SOUR @S29@\n1 FAMC @F20@\n0 @F19@ FAM\n1 HUSB @I10@\n1 WIFE @I51@\n1 CHIL @I52@\n1 CHIL @I53@\n1 CHIL @I54@\n1 CHIL @I55@\n1 CHIL @I56@\n0 @F20@ FAM\n1 HUSB @I56@\n1 WIFE @I57@\n1 MARR\n2 DATE 7 OCT 1930\n2 PLAC Kopyczy\u0144ce, Tarnopol, Poland\n2 NOTE Civil registration; rabbi Abraham Rosenberg; witnesses Beniamin Grossberg and Chaim Katz. A religious marriage evidently preceded it (son born 1930).\n2 SOUR @S30@\n3 PAGE Marriages 1930, akta 11, page 106\n1 CHIL @I58@\n0 @S29@ SOUR\n1 TITL Yad Vashem Pages of Testimony for Dawid, Marjem (Malka) and Eliezer (Lion Lusio) Sperling, submitted by Shlomo Verber and Eliezer Verber\n1 PUBL Yad Vashem Central Database of Shoah Victims' Names, items 2030065, 1542691, 8688064, 3636154, 3636807, 3637955\n0 @S30@ SOUR\n1 TITL Kopyczy\u0144ce Jewish marriages 1930\n1 PUBL AGAD Warsaw, Fond 300, sygn. 4116 (scan 0109); JRI-Poland index\n0 @I61@ INDI\n1 NAME Bassie /Sperling/\n1 SEX F\n1 BIRT\n2 DATE 1858\n2 PLAC Chorostk\u00f3w, Husiatyn, Galicia, Austria-Hungary\n2 SOUR @S28@\n3 PAGE Births 1858, akta 14\n1 FAMC @F3@\n1 NOTE Child of Josel and Gittel Sperling in the Chorostk\u00f3w birth index; Czarna's sibling and Sol's aunt or uncle. No later record found.\n0 @I62@ INDI\n1 NAME Chaje /Sperling/\n1 SEX F\n1 BIRT\n2 DATE 1874\n2 PLAC Chorostk\u00f3w, Husiatyn, Galicia, Austria-Hungary\n2 SOUR @S28@\n3 PAGE Births 1874, akta 27\n1 FAMC @F3@\n1 NOTE Child of Josel and Gittel Sperling in the Chorostk\u00f3w birth index; Czarna's sibling and Sol's aunt or uncle. No later record found.\n0 @I63@ INDI\n1 NAME Leib Moses /Sperling/\n1 SEX M\n1 BIRT\n2 DATE 1875\n2 PLAC Chorostk\u00f3w, Husiatyn, Galicia, Austria-Hungary\n2 SOUR @S28@\n3 PAGE Births 1875, akta 201\n1 FAMC @F3@\n1 NOTE Child of Josel and Gittel Sperling in the Chorostk\u00f3w birth index; Czarna's sibling and Sol's aunt or uncle. No later record found.\n0 @I59@ INDI\n1 NAME Rachela /Friedman/\n1 NAME Rachela /Freidman/\n2 TYPE AKA\n2 NOTE As indexed by JRI-Poland.\n1 NAME Rachela /Karniol/\n2 TYPE MARRIED\n1 SEX F\n1 BIRT\n2 DATE ABT 1906\n3 PHRASE \"reportedly\" 1906 on her 1932 marriage\n2 PLAC Kurdwan\u00f3wka, Buczacz, Galicia, Austria-Hungary\n2 SOUR @S27@\n1 NOTE \"Ritual daughter\" (religious-only marriage) of the late Chana Friedman of Buczacz; no father named. Fate unknown: no Page of Testimony found at Yad Vashem (Oct 2026), and nothing in the Arolsen Archives.\n1 FAMS @F18@\n0 @I60@ INDI\n1 NAME Chaim Eliezer /Karniol/\n1 SEX M\n1 BIRT\n2 DATE 1936\n2 PLAC Tarnopol, Tarnopol, Poland\n2 NOTE Tarnopol birth index book, record 219; parents not given.\n2 SOUR @S31@\n1 NOTE Evidently named for Lazar (Eliezer, d. 1929), so probably his grandson. Fate unknown.\n1 FAMC @F18@\n2 _CONF PROBABLE\n2 NOTE Probable: born in Tarnopol four years after Markus and Rachela's marriage and named for Markus's late father. Parents not named in the index.\n0 @S31@ SOUR\n1 TITL Tarnopol Jewish births, index book (1895-1942)\n1 PUBL Gesher Galicia, All Galicia Database\n0 TRLR"</script>
+<script>
+function run(raw, first){
+
+// ---- GEDCOM parse / serialize / 7.0 -> 5.5.1 export
+function gedParse(text){
+  const root={children:[]}, stack=[root];
+  for(const line of text.split(/\r?\n/)){
+    const m=line.match(/^(\d+)\s+(@[^@]+@\s+)?(\S+)\s?(.*)$/); if(!m) continue;
+    const lvl=+m[1], node={xref:m[2]?m[2].trim():null,tag:m[3],value:m[4]||'',children:[]};
+    stack.length=lvl+1; (stack[lvl]||root).children.push(node); stack[lvl+1]=node;
+  }
+  return root.children;
+}
+function gedSerialize(nodes){
+  const out=[];
+  (function w(ns,l){ns.forEach(n=>{out.push([l,n.xref,n.tag,n.value].filter(x=>x!==null&&x!=='').join(' '));w(n.children,l+1);});})(nodes,0);
+  return out.join('\n')+'\n';
+}
+const NO_LABEL={IMMI:'emigration',EMIG:'emigration',MARR:'marriage',DEAT:'death',BIRT:'birth',NATU:'naturalization'};
+function exidNote(n){
+  const t=(n.children.find(c=>c.tag==='TYPE')||{}).value||'';
+  return /yadvashem/.test(t)?`Yad Vashem item ${n.value} (${t}${n.value})`:`External ID ${n.value}${t?' ('+t+')':''}`;
+}
+function to551(recs){
+  const snotes={}; recs.forEach(r=>{if(r.tag==='SNOTE')snotes[r.xref]=r.value;});
+  const N=(v,ch=[])=>({xref:null,tag:'NOTE',value:v,children:ch});
+  function conv(children,parentTag){
+    const out=[];
+    for(const c of children){
+      const phrase=(c.children.find(k=>k.tag==='PHRASE')||{}).value;
+      switch(c.tag){
+        case 'PHRASE': case '_CONF': case 'SCHMA': case 'TRAN': continue;
+        case 'EXID': out.push(N(exidNote(c))); continue;
+        case 'SNOTE': out.push(N(snotes[c.value]||'')); continue;
+        case 'NO': {const ns=c.children.filter(k=>k.tag==='NOTE').map(k=>k.value).join(' ');
+          out.push(N(`No ${NO_LABEL[c.value]||c.value}.${ns?' '+ns:''}`)); continue;}
+        case 'HUSB': case 'WIFE':
+          if(c.value==='@VOID@'){ if(phrase) out.push(N(`${c.tag==='HUSB'?'Husband':'Wife'}: ${phrase}`)); continue; }
+          break;
+        case 'DATE': {
+          out.push({xref:null,tag:'DATE',value:c.value,children:[]});
+          if(phrase) out.push(N(`Date as recorded: ${phrase}`)); continue;}
+        case 'TYPE': if(parentTag==='NAME'){ out.push({xref:null,tag:'TYPE',value:c.value.toLowerCase()==='married'?'married':c.value.toLowerCase(),children:[]}); continue;} break;
+        case 'RESI': if(c.value){ const ch=conv(c.children,'RESI'); ch.unshift({xref:null,tag:'ADDR',value:c.value,children:[]});
+          out.push({xref:null,tag:'RESI',value:'',children:ch}); continue;} break;
+        case 'FAMC': if(c.children.some(k=>k.tag==='_CONF')){
+          const ch=conv(c.children,'FAMC'); ch.unshift(N('Parentage probable, not proven.'));
+          out.push({xref:null,tag:'FAMC',value:c.value,children:ch}); continue;} break;
+        case 'LANG': if(parentTag==='HEAD') continue; break;
+      }
+      const node={xref:c.xref,tag:c.tag,value:c.value,children:conv(c.children,c.tag)};
+      if(c.tag==='INDI'){
+        c.children.filter(k=>k.tag==='NAME').forEach(nm=>nm.children.filter(k=>k.tag==='TRAN').forEach(t=>{
+          const lang=(t.children.find(k=>k.tag==='LANG')||{}).value;
+          node.children.push(N(`${lang==='he'?'Hebrew':'Translated'} name: ${t.value}`));}));
+      }
+      out.push(node);
+    }
+    return out;
+  }
+  const body=conv(recs.filter(r=>r.tag!=='SNOTE'),'');
+  const head=body.find(r=>r.tag==='HEAD');
+  head.children=head.children.filter(c=>c.tag!=='GEDC'&&c.tag!=='NOTE');
+  head.children.push(N('Exported from the GEDCOM 7.0 master. GEDCOM 7 details (date phrases, probable-parentage flags, Hebrew names, Yad Vashem IDs, shared notes) are written as notes.'));
+  head.children.unshift({xref:null,tag:'GEDC',value:'',children:[{xref:null,tag:'VERS',value:'5.5.1',children:[]},{xref:null,tag:'FORM',value:'LINEAGE-LINKED',children:[]}]});
+  head.children.push({xref:null,tag:'CHAR',value:'UTF-8',children:[]});
+  return gedSerialize(body);
+}
+
+
+const recs=gedParse(raw), byId={};
+recs.forEach(r=>{ if(r.xref) byId[r.xref]=r; });
+const kid=(n,t)=>n.children.find(c=>c.tag===t);
+const kids=(n,t)=>n.children.filter(c=>c.tag===t);
+const val=(n,t)=>{const k=kid(n,t);return k?k.value:'';};
+
+const people={}, fams={};
+recs.forEach(r=>{
+  if(r.tag==='INDI'){
+    const names=kids(r,'NAME').map(n=>n.value.replace(/\//g,'').replace(/\s+/g,' ').trim()).filter(Boolean);
+    people[r.xref]={id:r.xref,rec:r,names,famc:kids(r,'FAMC').map(k=>k.value),fams:kids(r,'FAMS').map(k=>k.value)};
+  } else if(r.tag==='FAM'){
+    fams[r.xref]={id:r.xref,rec:r,husb:val(r,'HUSB'),wife:val(r,'WIFE'),chil:kids(r,'CHIL').map(k=>k.value)};
+  }
+});
+
+// ---- presentation choices that are not part of GEDCOM
+const SNOTES={}; recs.forEach(r=>{if(r.tag==='SNOTE')SNOTES[r.xref]=r.value;});
+const PROBABLE_CHILD={}; Object.values(people).forEach(p=>kids(p.rec,'FAMC').forEach(f=>{
+  if(val(f,'_CONF')==='PROBABLE'){ const t=kids(f,'NOTE').map(n=>n.value).join(' ')||'Probable, not proven.';
+    PROBABLE_CHILD[p.id]=PROBABLE_CHILD[p.id]?PROBABLE_CHILD[p.id]+' '+t:t; }}));
+const POS={ // [column, generation]
+'@I49@':[11.2,-1],'@I50@':[12.2,-1],'@I31@':[10.7,0],'@I32@':[11.7,0],'@I34@':[7.2,1],'@I33@':[8.2,1],'@I44@':[6.2,2],'@I45@':[7.2,2],'@I35@':[8.2,2],'@I36@':[9.2,2],'@I39@':[10.2,2],'@I40@':[11.2,2],'@I37@':[8.2,3],'@I38@':[9.2,3],'@I41@':[10.2,3],'@I42@':[11.2,3],'@I43@':[12.2,3],'@I46@':[12.7,1],'@I47@':[12.2,2],'@I48@':[13.2,2],'@I11@':[14.2,1],'@I12@':[15.2,1],'@I1@':[14.2,2],'@I2@':[15.2,2],'@I13@':[17.2,2],'@I14@':[16.2,2],'@I3@':[13.7,3],'@I4@':[14.7,3],'@I5@':[15.7,3],'@I22@':[15.5,0],'@I23@':[16.5,0],'@I15@':[18.8,0],'@I16@':[19.8,0],'@I21@':[16.4,1],'@I17@':[17.4,1],'@I18@':[18.6,1],'@I19@':[20.3,1],'@I20@':[21.3,1],'@I26@':[22.5,2],'@I27@':[23.5,2],'@I28@':[22.0,3],'@I29@':[23.0,3],'@I30@':[24.0,3],'@I51@':[0,1],'@I10@':[1,1],'@I6@':[3.2,1],'@I7@':[4.2,1],'@I8@':[2.1,0],'@I9@':[3.1,0],'@I52@':[0,2],'@I53@':[1,2],'@I54@':[2,2],'@I55@':[3,2],'@I56@':[4,2],'@I57@':[5,2],'@I58@':[4.5,3],'@I61@':[2,1],'@I62@':[5.2,1],'@I63@':[6.2,1],'@I59@':[18.2,2],'@I60@':[17.7,3]};
+const BUS_SHIFT={'@F7@':-16,'@F8@':14,'@F11@':-22,'@F3@':10,'@F2@':-30,'@F16@':12,'@F4@':12};
+
+function yearOf(ev){
+  if(!ev) return '';
+  const d=val(ev,'DATE'); if(!d) return '';
+  let m;
+  if(m=d.match(/^BET\s+(\d{4})\s+AND\s+(\d{4})/)) return m[1]+'–'+m[2].slice(2);
+  const y=(d.match(/(\d{4})/)||[])[1]; if(!y) return '';
+  return (/^(ABT|EST|CAL)/.test(d)?'c. ':'')+y;
+}
+function lifespan(p){
+  const b=yearOf(kid(p.rec,'BIRT')), d=yearOf(kid(p.rec,'DEAT'));
+  if(!b&&!d) return '';
+  return (b||'?')+' – '+(d||'');
+}
+function isMemorial(p){
+  const d=kid(p.rec,'DEAT'); return !!(d && kids(d,'NOTE').some(n=>/Holocaust/.test(n.value)));
+}
+function shortName(p){
+  const n=p.names[0]||'Unknown';
+  return n.length>20? n.split(' ').filter((w,i,a)=>i===0||i===a.length-1).join(' ') : n;
+}
+
+// ---- draw
+const UNIT=180, CW=156, CH=62, ROWH=150, PAD=30;
+let zoom=1;
+const NS='http://www.w3.org/2000/svg';
+const el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+const minRow=Math.min(...Object.values(POS).map(p=>p[1]));
+const cx=id=>PAD+POS[id][0]*UNIT+CW/2, ty=id=>PAD+(POS[id][1]-minRow)*ROWH;
+const maxCol=Math.max(...Object.values(POS).map(p=>p[0])), maxRow=Math.max(...Object.values(POS).map(p=>p[1]))-minRow;
+const W=PAD*2+maxCol*UNIT+CW, H=PAD*2+maxRow*ROWH+CH;
+const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'group'});
+const gl=el('g',{}), gp=el('g',{});
+svg.append(gl,gp);
+
+Object.values(fams).forEach(f=>{
+  const ps=[f.husb,f.wife].filter(id=>POS[id]);
+  if(ps.length===2){
+    const [a,b]=ps.sort((x,y)=>POS[x][0]-POS[y][0]);
+    const y=ty(a)+CH/2;
+    gl.append(el('line',{x1:cx(a)+CW/2,y1:y,x2:cx(b)-CW/2,y2:y,class:'mar'}));
+  }
+  const ch=f.chil.filter(id=>POS[id]); if(!ch.length||!ps.length) return;
+  const mx=ps.reduce((s,id)=>s+cx(id),0)/ps.length, py=ty(ps[0])+CH/2;
+  const busY=ty(ps[0])+CH+(ROWH-CH)/2+(BUS_SHIFT[f.id]||0);
+  const allProb=ch.every(id=>PROBABLE_CHILD[id]);
+  gl.append(el('line',{x1:mx,y1:py,x2:mx,y2:busY,class:'lk'+(allProb?' prob':'')}));
+  const xs=ch.map(cx).concat(mx);
+  gl.append(el('line',{x1:Math.min(...xs),y1:busY,x2:Math.max(...xs),y2:busY,class:'lk'+(allProb?' prob':'')}));
+  ch.forEach(id=>gl.append(el('line',{x1:cx(id),y1:busY,x2:cx(id),y2:ty(id),class:'lk'+(PROBABLE_CHILD[id]?' prob':'')})));
+});
+
+const nodes={};
+Object.values(people).forEach(p=>{
+  if(!POS[p.id]) return;
+  const x=PAD+POS[p.id][0]*UNIT, y=ty(p.id);
+  const g=el('g',{class:'person',transform:`translate(${x},${y})`,tabindex:0,role:'button','aria-label':p.names[0]+' '+lifespan(p)});
+  g.append(el('rect',{class:'box',width:CW,height:CH,rx:3}));
+  if(isMemorial(p)) g.append(el('rect',{class:'mem',width:5,height:CH,rx:1}));
+  const t1=el('text',{class:'nm',x:14,y:26}); t1.textContent=shortName(p);
+  const t2=el('text',{class:'yr',x:14,y:47}); t2.textContent=lifespan(p);
+  g.append(t1,t2);
+  g.addEventListener('click',()=>select(p.id));
+  g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(p.id);}});
+  gp.append(g); nodes[p.id]=g;
+});
+const canvas=document.getElementById('canvas');
+canvas.append(svg);
+function applyZoom(){svg.setAttribute('width',W*zoom);svg.setAttribute('height',H*zoom);}
+applyZoom();
+document.getElementById('zi').onclick=()=>{zoom=Math.min(2,zoom*1.2);applyZoom();};
+document.getElementById('zo').onclick=()=>{zoom=Math.max(.4,zoom/1.2);applyZoom();};
+
+// ---- detail panel
+const panel=document.getElementById('panel');
+const NOLAB={IMMI:'Did not emigrate'};
+const LABEL={BIRT:'Born',DEAT:'Died',IMMI:'Arrived',NATU:'Naturalized',RESI:'Lived',OCCU:'Occupation',MARR:'Married'};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function fmtDate(d){
+  return d.replace(/^ABT /,'about ').replace(/^BET (\S+) AND (\S+)/,'between $1 and $2').replace(/^FROM (\S+) TO (\S+)/,'$1 to $2').replace(/^FROM (\S+)$/,'from $1')
+    .replace(/\b(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\b/g,m=>m[0]+m.slice(1).toLowerCase());
+}
+function srcText(s){
+  const r=byId[s.value]; if(!r) return '';
+  let t=val(r,'TITL'); const pg=val(s,'PAGE'); if(pg) t+=', '+pg; return t;
+}
+function eventHTML(ev){
+  const parts=[];
+  if(ev.value) parts.push(esc(ev.value));
+  const dn=kid(ev,'DATE'); if(dn&&dn.value){ let s=esc(fmtDate(dn.value)); const ph=val(dn,'PHRASE'); if(ph) s+=` <span class="src">(${esc(ph)})</span>`; parts.push(s);}
+  const pl=val(ev,'PLAC')||val(ev,'ADDR'); if(pl) parts.push(esc(pl));
+  let h=`<div class="ev"><span class="what">${LABEL[ev.tag]}</span> ${parts.join(', ')}`;
+  kids(ev,'NOTE').forEach(n=>h+=`<div class="note">${esc(n.value)}</div>`);
+  kids(ev,'SNOTE').forEach(n=>h+=`<div class="note">${esc(SNOTES[n.value]||'')}</div>`);
+  kids(ev,'SOUR').forEach(s=>h+=`<div class="src">Source: ${esc(srcText(s))}</div>`);
+  return h+'</div>';
+}
+const link=id=>`<a data-id="${id}">${esc(people[id].names[0]||'Unknown')}</a>`;
+function select(id){
+  const p=people[id];
+  Object.values(nodes).forEach(n=>n.classList.remove('sel'));
+  nodes[id].classList.add('sel');
+  let h=`<h2>${esc(p.names[0]||'Unknown')}</h2>`;
+  const heb=kids(p.rec,'NAME').flatMap(n=>kids(n,'TRAN').map(x=>x.value));
+  const aka=p.names.slice(1).concat(heb.map(x=>'<span dir="rtl" lang="he">'+esc(x)+'</span>'));
+  if(aka.length) h+=`<p class="aka">Also recorded as ${aka.map(x=>x.startsWith('<span')?x:esc(x)).join('; ')}</p>`;
+  if(PROBABLE_CHILD[id]) h+=`<span class="flag prob">Probable parentage</span>`;
+  if(isMemorial(p)) h+=`<span class="flag mem">Murdered in the Holocaust</span>`;
+  const evs=p.rec.children.filter(c=>LABEL[c.tag]);
+  p.fams.forEach(fid=>{const m=kid(fams[fid].rec,'MARR'); if(m) evs.push(m);});
+  if(evs.length){h+='<h3>Records</h3>';evs.forEach(e=>h+=eventHTML(e));}
+  kids(p.rec,'NO').forEach(n=>{h+=`<div class="ev"><span class="what">${NOLAB[n.value]||('No '+n.value)}</span>`;kids(n,'NOTE').forEach(x=>h+=`<div class="note">${esc(x.value)}</div>`);h+='</div>';});
+  if(PROBABLE_CHILD[id]) h+=`<p class="note">${esc(PROBABLE_CHILD[id])}</p>`;
+  const ex=kids(p.rec,'EXID'); if(ex.length){h+='<h3>Online records</h3>';ex.forEach(e=>{const ty=val(e,'TYPE');
+    h+= /^https:/.test(ty)?`<p class="rel"><a href="${esc(ty+e.value)}" target="_blank" rel="noopener">${/yadvashem/.test(ty)?'Yad Vashem':'Record'} ${esc(e.value)}</a></p>`:`<p class="rel">${esc(e.value)}</p>`;});}
+  const notes=kids(p.rec,'NOTE'); if(notes.length){h+='<h3>Notes</h3>';notes.forEach(n=>h+=`<p class="note">${esc(n.value)}</p>`);}
+  h+='<h3>Family</h3>';
+  p.famc.forEach(fid=>{const f=fams[fid];const ps=[f.husb,f.wife].filter(x=>people[x]);
+    if(ps.length) h+=`<p class="rel">Parents: ${ps.map(link).join(' and ')}</p>`;
+    const sib=f.chil.filter(c=>c!==id); if(sib.length) h+=`<p class="rel">Siblings: ${sib.map(link).join(', ')}</p>`;});
+  p.fams.forEach(fid=>{const f=fams[fid];const sp=[f.husb,f.wife].find(x=>x&&x!==id&&people[x]);
+    if(sp) h+=`<p class="rel">Spouse: ${link(sp)}</p>`;
+    else { const v=[kid(f.rec,'HUSB'),kid(f.rec,'WIFE')].find(n=>n&&n.value==='@VOID@'); if(v) h+=`<p class="rel">Spouse: ${esc(val(v,'PHRASE')||'unknown')}</p>`; }
+    if(f.chil.length) h+=`<p class="rel">Children: ${f.chil.map(link).join(', ')}</p>`;
+    kids(f.rec,'NOTE').forEach(n=>h+=`<p class="note">${esc(n.value)}</p>`);});
+  window._sel=id; panel.innerHTML=h; panel.scrollTop=0;
+  panel.querySelectorAll('a[data-id]').forEach(a=>{a.tabIndex=0;a.onclick=()=>select(a.dataset.id);a.onkeydown=e=>{if(e.key==='Enter')select(a.dataset.id);};});
+  const r=nodes[id].getBoundingClientRect(), c=canvas.getBoundingClientRect();
+  if(r.left<c.left||r.right>c.right||r.top<c.top||r.bottom>c.bottom)
+    canvas.scrollBy({left:r.left-c.left-c.width/2+r.width/2,top:r.top-c.top-c.height/2+r.height/2});
+}
+
+// ---- search
+const dlist=document.getElementById('names'), index=[];
+Object.values(people).forEach(p=>{ if(!POS[p.id]) return; p.names.forEach(n=>{index.push([n.toLowerCase(),p.id]);});
+  const o=document.createElement('option'); o.value=p.names[0]; dlist.append(o);});
+document.getElementById('q').addEventListener('change',e=>{
+  const q=e.target.value.trim().toLowerCase(); if(!q) return;
+  const hit=index.find(([n])=>n===q)||index.find(([n])=>n.includes(q));
+  if(hit) select(hit[1]);
+});
+
+// ---- download (standalone)
+(function(){
+  const save=(name,text)=>{const u=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));
+    const l=document.createElement('a');l.href=u;l.download=name;document.body.append(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),1000);};
+  const b7=document.getElementById('dl7'), b5=document.getElementById('dl5');
+  b7.hidden=b5.hidden=false;
+  b7.onclick=()=>save('goldman-karniol-gedcom7.ged',raw+'\n');
+  b5.onclick=()=>save('goldman-karniol-gedcom551.ged',to551(gedParse(raw)));
+})();
+
+// start centred on Solomon and Clara
+if(first) requestAnimationFrame(()=>{ canvas.scrollLeft=Math.max(0,cx('@I1@')*zoom-canvas.clientWidth/3); });
+  if(!first && window._sel && people[window._sel]) select(window._sel);
+}
+(function(){
+  const raw=JSON.parse(document.getElementById('gedcom').textContent);
+  document.getElementById('panel').innerHTML='<p class="empty">Select anyone in the tree to see what the records say about them.</p>';
+  run(raw.trim(), true);
+})();
+</script>
+</body>
+</html>
