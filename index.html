@@ -211,7 +211,7 @@ function lifespan(p){
   return (b||'?')+' – '+(d||'');
 }
 function isMemorial(p){
-  const d=kid(p.rec,'DEAT'); return !!(d && kids(d,'NOTE').some(n=>/Holocaust/.test(n.value)));
+  const d=kid(p.rec,'DEAT'); return !!(d && kids(d,'NOTE').some(n=>/Holocaust|Shoah/.test(n.value)));
 }
 function shortName(p){
   const n=p.names[0]||'Unknown';
